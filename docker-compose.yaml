@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=MPSIGC6JQV5WB79N4032K8XAYETUZ1HD
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=Calcdata
+  
+  frontend:
+    build: ./cinema-calc
+    container_name: frontend-container
+    ports:
+      - '3000:3000'
+  
+  backend:
+    build: ./CalcApi
+    container_name: backend-container
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRESS__PASSWORD=MPSIGC6JQV5WB79N4032K8XAYETUZ1HD
+    
