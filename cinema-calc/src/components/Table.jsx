@@ -5,12 +5,30 @@ import { Window } from './Window'
 import axios from 'axios';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export const Table = () => {
   const [rowToEdit, setRowToEdit] = useState(null);
-  const [windowOpen, setWindowOpen] = useState(false);
+  // const [windowOpen, setWindowOpen] = useState(false);
   const [rows, setRows] = useState([]);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
+  const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
+
+  const row = {
+    name: "",
+    price: "",
+    percentage: "",
+    total: ""
+  }
 
   var grossTotal = 0;
 
@@ -31,9 +49,13 @@ export const Table = () => {
   }, []);
 
 
+  const handleAdd = async () => {
+    setRows([...rows, row])
+  };
+
   const deleteRow = async (id, name) => {
     console.log(id, name);
-
+    
     if (window.confirm('Are you sure you want to delete this entry!!?')) {
       // Save it!
       console.log('This was deleted in the database.');
@@ -41,8 +63,10 @@ export const Table = () => {
       try {
         const response = await axios.delete("http://localhost:8080/deleteCalcItem/" + name);
         console.log("Row Deleted:", response.data);
+        setAlert({ open: true, message: 'Row deleted successfully!', severity: 'success' });
       } catch (error) {
         console.error("Error creating post:", error);
+        setAlert({ open: true, message: 'Failed to Delete the Row!', severity: 'error' });
       }
     } else {
       // Do nothing!
@@ -50,118 +74,214 @@ export const Table = () => {
     }
   };
 
-  const editRow = async (id, name) => {
-    console.log(id, name);
-    setRowToEdit(id)
-    setWindowOpen(true)
-  };
+  // const editRow = async (id, name) => {
+  //   console.log(id, name);
+  //   setRowToEdit(id)
+  //   setWindowOpen(true)
+  // };
 
-  const handleSubmit = async (newRow) => {
-    newRow.total = parseInt(newRow.price) + (parseInt(newRow.price) * parseInt(newRow.percentage)/100); 
-    console.log("New Row total:", newRow.total)
-    if (rowToEdit === null) {
-      setRows([...rows, newRow])
+  const submitData = async (newRow) => {
+    if(newRow.name !== "" && newRow.price !== "" && newRow.percentage !== ""){
+      console.log("Sent: ",newRow)
       try {
         const response = await axios.post("http://localhost:8080/addCalcItems", newRow);
         console.log("Row created:", response.data);
+        // Show success alert
+      setAlert({ open: true, message: 'Data submitted successfully!', severity: 'success' });
       } catch (error) {
         console.error("Error creating post:", error);
+        setAlert({ open: true, message: 'Error submitting data', severity: 'error' });
       }
-    } else {
-      setRows(
-        rows.map((currRow, idx) => {
-          if (idx !== rowToEdit) return currRow;
+    }
+  }
 
-          return newRow;
-        })
-      );
-      try {
-        const response = await axios.post("http://localhost:8080/updateCalcItem/"+newRow.name, newRow);
-        console.log("Row Updated:", response.data);
-      } catch (error) {
-        console.error("Error creating post:", error);
+  // const handleSubmit = async (newRow) => {
+  //   newRow.total = parseInt(newRow.price) + (parseInt(newRow.price) * parseInt(newRow.percentage) / 100);
+  //   console.log("New Row total:", newRow.total)
+  //   if (rowToEdit === null) {
+  //     setRows([...rows, newRow])
+  //     try {
+  //       const response = await axios.post("http://localhost:8080/addCalcItems", newRow);
+  //       console.log("Row created:", response.data);
+  //     } catch (error) {
+  //       console.error("Error creating post:", error);
+  //     }
+  //   } else {
+  //     setRows(
+  //       rows.map((currRow, idx) => {
+  //         if (idx !== rowToEdit) return currRow;
+
+  //         return newRow;
+  //       })
+  //     );
+  //     try {
+  //       const response = await axios.post("http://localhost:8080/updateCalcItem/" + newRow.name, newRow);
+  //       console.log("Row Updated:", response.data);
+  //     } catch (error) {
+  //       console.error("Error creating post:", error);
+  //     }
+
+  //   }
+
+  //   // rowToEdit === null
+  //   //   ? setRows([...rows, newRow])
+  //   //   : setRows(
+  //   //     rows.map((currRow, idx) => {
+  //   //       if (idx !== rowToEdit) return currRow;
+
+  //   //       return newRow;
+  //   //     })
+  //   //   );
+
+  // };
+
+  const onChangeInput = (e, id) => {
+    const { name, value } = e.target
+    console.log(id, name, value)
+    const updatedRows = rows.map((item, i) => {
+      if (i === id) {
+        const updatedItem = { ...item, [name]: value };
+        const price = parseFloat(updatedItem.price) || 0;
+        const percentage = parseFloat(updatedItem.percentage) || 0;
+
+        const total = price + (price * percentage) / 100;
+        return { ...updatedItem, total: total};
       }
+      return item;
+    });
+    
+    setRows(updatedRows)
 
-
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
     }
 
-    // rowToEdit === null
-    //   ? setRows([...rows, newRow])
-    //   : setRows(
-    //     rows.map((currRow, idx) => {
-    //       if (idx !== rowToEdit) return currRow;
+    const timeout = setTimeout(() => {
+      submitData(updatedRows[id]);
+    }, 1000); 
 
-    //       return newRow;
-    //     })
-    //   );
+    setDebounceTimeout(timeout);
+  }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlert({ ...alert, open: false });
   };
 
 
   return (
     <div>
-      <button className='gradButton' onClick={() => setWindowOpen(true)}>Add New Item</button>
-      {windowOpen && (
-        <Window
-          closeWindow={() => {
-            setWindowOpen(false);
-            setRowToEdit(null);
-          }}
-          onSubmit={handleSubmit}
-          defaultValue={rowToEdit !== null && rows[rowToEdit]}
-        />
-      )}
+      <button className='gradButton' onClick={() => handleAdd()}>Add New Item</button>
+      {/* <Button variant="contained" onClick={() => handleAdd()} disableElevation>
+      Add New Item    </Button> */}
       <Card className='card-rad'>
-      <table className='table'>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Percentage</th>
-            <th>Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, id) => {
-            grossTotal = grossTotal + (parseInt(row.price) + parseInt((row.price * row.percentage) / 100))
-            return (
-              <tr key={id}>
-                <td name="Name">{row.name}</td>
-                <td name="Price">{row.price}€</td>
-                <td name="Percentage">
-                  {row.percentage}%
-                </td>
-                <td name="Total">
-                  {row.total}€
-                </td>
-                <td className="fit" >
-                  <span className="actions">
-                    <BsFillTrashFill
-                      className="delete-btn"
-                      onClick={() => deleteRow(id, row.name)}
-                    />
-                    <BsFillPencilFill
-                      className="edit-btn"
-                      onClick={() => editRow(id, row.name)}
-                    />
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th></th>
-            <th></th>
-            <th className='foot'>Gross Total:</th>
-            <th>{grossTotal}€</th>
-            <th></th>
-          </tr>
-        </tfoot>
-      </table>
+        <table className='table'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Percentage</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, id) => {
+              grossTotal = grossTotal + (parseInt(row.price) + parseInt((row.price * row.percentage) / 100))
+              return (
+                <tr key={id}>
+                  <td><TextField
+                    id="outlined-basic"
+                    name="name"
+                    label="Name"
+                    value={row.name}
+                    fullWidth
+                    onChange={(e) => onChangeInput(e, id)}
+                    variant="outlined" />
+                  </td>
+                  <td><TextField
+                    id="outlined-basic"
+                    name="price"
+                    label="Price"
+                    fullWidth
+                    value={row.price}
+                    slotProps={{
+                      input: {
+                        startAdornment: <InputAdornment position="start">€</InputAdornment>,
+                      },
+                    }}
+                    onChange={(e) => onChangeInput(e, id)}
+                    variant="outlined" />
+                  </td>
+                  <td>
+                    <TextField
+                      id="outlined-basic"
+                      name="percentage"
+                      label="Percentage"
+                      fullWidth
+                      value={row.percentage}
+                      slotProps={{
+                        input: {
+                          startAdornment: <InputAdornment position="start">%</InputAdornment>,
+                        },
+                      }}
+                      onChange={(e) => onChangeInput(e, id)}
+                      variant="outlined" />
+                  </td>
+                  <td>
+                    <TextField
+                      id="outlined-basic"
+                      name="total"
+                      label="Total"
+                      fullWidth
+                      value={row.total}
+                      slotProps={{
+                        input: {
+                          readOnly: true,
+                          startAdornment: <InputAdornment position="start">€</InputAdornment>,
+                        },
+                      }}
+
+                      variant="outlined" />
+                  </td>
+                  <td className="fit" >
+                    <span className="actions">
+                      <BsFillTrashFill
+                        className="delete-btn"
+                        onClick={() => deleteRow(id, row.name)}
+                      />
+                      {/* <BsFillPencilFill
+                        className="edit-btn"
+                        onClick={() => editRow(id, row.name)}
+                      /> */}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot >
+            <tr>
+              <th className='footbg'></th>
+              <th className='footbg'></th>
+              <th className='footbg foot'>Gross Total:</th>
+              <th className='footbg'>{grossTotal}€</th>
+              <th className='footbg'></th>
+            </tr>
+          </tfoot>
+        </table>
       </Card>
+
+      <Snackbar open={alert.open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={alert.severity} sx={{ width: '100%' }}>
+          {alert.message}
+        </Alert>
+
+      </Snackbar>
+
+     
     </div>
   )
 }

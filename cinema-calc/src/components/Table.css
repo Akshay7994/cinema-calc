@@ -42,7 +42,7 @@
 
 .card-rad{
   border-radius: 20px !important;
-  margin: 20px;
+  margin: 15px 15px 15px 15px;
 }
 
 /* Mobile view (below 600px) */
@@ -81,8 +81,13 @@
       border: none;
       background-color: #fff;
   }
+  h1 {
+    font-size: 50px !important;
+    line-height: 80%;
+    margin: 10px 10px;
+  }
 
-  .table td:before {
+  /* .table td:before {
       content: attr(name) ": ";
       font-weight: bold;
       color: #333;
@@ -95,7 +100,12 @@
       color: #333;
       display: inline;
       margin-bottom: 5px;
-  }
+  } */
+}
+
+.footbg{
+  color: #030303 !important;
+  background-color: transparent !important;
 }
 
 .foot{
