@@ -151,3 +151,23 @@
   text-align: center;
 }
 }
+
+.xls-btn {
+  justify-content: right;
+  width: 40px;
+  height: 40px;
+  background-image: url('./xls.png');
+  background-size: cover;
+  border:0;
+  /* background-color: #eee; */
+}
+
+.pdf-btn {
+  justify-content: right;
+  width: 40px;
+  height: 40px;
+  background-image: url('./pdf.png');
+  background-size: cover;
+  border:0;
+  /* background-color: #eee; */
+}

@@ -10,6 +10,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import * as XLSX from 'xlsx';
+import { usePDF } from 'react-to-pdf';  
 
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -22,6 +24,8 @@ export const Table = () => {
   const [rows, setRows] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
+  const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});  
+
 
   const row = {
     name: "",
@@ -140,7 +144,7 @@ export const Table = () => {
     console.log(id, name, value)
     const updatedRows = rows.map((item, i) => {
       if (i === id) {
-        const updatedItem = { ...item, [name]: value };
+        const updatedItem = { ...item, [name]: value.trim() };
         const price = parseFloat(updatedItem.price) || 0;
         const percentage = parseFloat(updatedItem.percentage) || 0;
 
@@ -170,9 +174,15 @@ export const Table = () => {
     setAlert({ ...alert, open: false });
   };
 
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "DataSheet.xlsx");
+  };
 
   return (
-    <div>
+    <div ref={targetRef}>
       <button className='gradButton' onClick={() => handleAdd()}>Add New Item</button>
       {/* <Button variant="contained" onClick={() => handleAdd()} disableElevation>
       Add New Item    </Button> */}
@@ -205,6 +215,7 @@ export const Table = () => {
                     id="outlined-basic"
                     name="price"
                     label="Price"
+                    type='number' 
                     fullWidth
                     value={row.price}
                     slotProps={{
@@ -220,6 +231,7 @@ export const Table = () => {
                       id="outlined-basic"
                       name="percentage"
                       label="Percentage"
+                      type='number' 
                       fullWidth
                       value={row.percentage}
                       slotProps={{
@@ -280,6 +292,8 @@ export const Table = () => {
         </Alert>
 
       </Snackbar>
+      <button className='xls-btn' onClick={() => downloadExcel()}></button>
+      <button className='pdf-btn' onClick={() =>  toPDF()}></button>
 
      
     </div>
