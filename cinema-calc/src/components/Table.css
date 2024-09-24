@@ -162,11 +162,11 @@
   background-size: cover;
   border:0;
   /* background-color: #eee; */
-  background-color: #282c34;
+  background-color: #c7c7c7;
 }
 
 .pdf-btn {
-  background-color: #282c34;
+  background-color: #c7c7c7;
 
   justify-content: right;
   width: 40px;

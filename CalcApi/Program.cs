@@ -11,7 +11,9 @@ builder.Services.AddDbContext<CalcContext>(options =>
 
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     var password = Environment.GetEnvironmentVariable("POSTGRESS__PASSWORD");
-    connectionString = string.Format(connectionString, password);
+    var username= Environment.GetEnvironmentVariable("POSTGRESS__USERNAME");
+    Console.WriteLine(password);
+    connectionString = string.Format(connectionString, username, password);
     options.UseNpgsql(connectionString);
 
 });
