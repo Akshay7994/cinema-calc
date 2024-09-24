@@ -113,7 +113,7 @@ https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetc
 1. Created webapi with controller with dotnet.
 2. Setup Models and Registered DbContext.
 3. Register DbContext in Program.cs
-4. Generate a controller and link it with its respective model using the asp-codegenerator.
+4. Run migration commands and update the database.
 
 * Database integration for get, post and delete methods.
 To undestand migration and db creation from the C#: 
