@@ -103,7 +103,7 @@ I broke down the whole task into various smaller tasks like
 * Created .env based Connection String passing to docker-compose to avoid hardcoding any secrets on the application.
 ```
 6. Use the readme as a notepad to make us understand your thinking.
-```
+
 * Setting up environment.
 Update node and npm. 
 Start a react project. 
@@ -145,7 +145,3 @@ https://mui.com/material-ui/react-text-field/
 * Created Dockerfile for both frontend, backend and Database with its docker-compose.
 * Created .env based Connection String passing to docker-compose to avoid hardcoding any secrets on the application.
 https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/
-
-
-
-```
