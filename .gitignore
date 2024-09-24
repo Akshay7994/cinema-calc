@@ -41,4 +41,4 @@ desktop.ini
 
 # Ignore any local configuration files
 **/local.settings.json
-.env
+./.env
