@@ -12,15 +12,18 @@ Run `docker-compose up --build`
 
 2. What is the overall structure of your code?
 ```
-A react application with Javascript is used to develop the frontend with material ui as component styling. Axios is used for calling restApi's 
-and handle persistent storage of data. The application consists of an editable table to manage cinema expenses effeciently. Component based code 
-sturucture is used to seperate each component and allow modularity in the code. Each component consists of a .jsx and .css file to manage 
-functionality and styling.
+A react application with Javascript is used to develop the frontend with material ui as component 
+styling. Axios is used for calling restApi's and handle persistent storage of data. The application 
+consists of an editable table to manage cinema expenses effeciently. Component based code sturucture 
+is used to seperate each component and allow modularity in the code. Each component consists of a 
+.jsx and .css file to manage functionality and styling.
 
-A C# Minimal Api is used for developing a backend to create GET, POST, DELETE RestAPI's required for the appication. To manage the datastorage a 
-PostgresSQL db is used to store the expense data. Model and Controller based approach is used here to manage database migration with a proper database context. 
-Controllers are managed in Porgram.cs file itself as the API's did not include any complex authentication or backend operations hence making it lightweight and fast. 
-The current implementation can be modified as separate controller based approach as well.
+A C# Minimal Api is used for developing a backend to create GET, POST, DELETE RestAPI's required for 
+the appication. To manage the datastorage a PostgresSQL db is used to store the expense data. Model and
+ Controller based approach is used here to manage database migration with a proper database context. 
+ Controllers are managed in Porgram.cs file itself as the API's did not include any complex authentication 
+ or backend operations hence making it lightweight and fast. The current implementation can be modified as 
+ separate controller based approach as well.
 
 Overall Project Structure:
 ├── 100_ASSETS
@@ -71,14 +74,15 @@ Overall Project Structure:
 3. How do you manage state in your application? Why did you choose this solution?
 ```
 Local state management approach *useState* is used to manage state in the application.
-As the application was a single component and has basic functionality of add, edit and delete features on a list.
-Hence i found using useState is simple and better in the current scenario.
+As the application was a single component and has basic functionality of add, edit and delete features 
+on a list. Hence i found using useState is simple and better in the current scenario.
 ```
 
 4. How does your approach for precise number calculations work?
 ```
 The total of each expense is caculated as a record is entered and pushed to backend as per the given formula.
-Grand total is calculated when the rows are populated on the page so any changes on the state will reflect immediately on the Gross total and Total fields. 
+Grand total is calculated when the rows are populated on the page so any changes on the state will reflect 
+immediately on the Gross total and Total fields. 
 ```
 5. What „tasks“ did you have on your mind? How did you break down the different deliverables?
 ```
