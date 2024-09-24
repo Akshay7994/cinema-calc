@@ -12,6 +12,7 @@ COPY . .
 # ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
+# RUN dotnet-ef database update
 # RUN dotnet ef database update
 
 # Final stage to build the runtime image

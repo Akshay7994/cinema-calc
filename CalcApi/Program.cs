@@ -4,26 +4,14 @@ using System;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
-DotNetEnv.Env.Load();
-// var connectionString= DotNetEnv.Env.GetString("CONNECTION_STRING");
-// var str= Environment.GetEnvironmentVariable("CONNECTION_STRING");
-
-// Console.WriteLine("Connection String:", connectionString);
-// Console.WriteLine("Connection String:"+str);
-// DB Context
-// builder.Services.AddDbContext<CalcContext>(options => options.UseNpgsql(connectionString));
-
 
 // Using ENV
 builder.Services.AddDbContext<CalcContext>(options =>
 {
 
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    // Console.WriteLine(connectionString);
     var password = Environment.GetEnvironmentVariable("POSTGRESS__PASSWORD");
-    // Console.WriteLine(password);
     connectionString = string.Format(connectionString, password);
-    // Console.WriteLine(connectionString);
     options.UseNpgsql(connectionString);
 
 });
@@ -52,8 +40,20 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Use CORS
-app.UseCors("AllowReactApp");
+app.UseCors(builder =>
+      {
+        builder
+              .WithOrigins("http://localhost:3000")
+              .SetIsOriginAllowedToAllowWildcardSubdomains()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .WithMethods("GET", "PUT", "POST", "DELETE", "OPTIONS")
+              .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
+ 
+      }
+);
 
+// Swagger Init
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
@@ -68,10 +68,11 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => "Hello World!");
 
+// Get data
 app.MapGet("/getCalcData", async (CalcContext db) =>
     await db.CalcItems.ToListAsync());
 
-
+// Add and Update Data
 app.MapPost("/addCalcItems", async (CalcItem ci, CalcContext db) =>
 {
     var calcIt = await db.CalcItems.FindAsync(ci.Name);
@@ -97,6 +98,7 @@ app.MapPost("/addCalcItems", async (CalcItem ci, CalcContext db) =>
 
 });
 
+// Update Data
 app.MapPost("/updateCalcItem/{name}", async (string name, CalcItem ci, CalcContext db) =>
 {
     var calcIt = await db.CalcItems.FindAsync(name);
@@ -112,6 +114,8 @@ app.MapPost("/updateCalcItem/{name}", async (string name, CalcItem ci, CalcConte
     return Results.NoContent();
 });
 
+
+// Delete Data
 app.MapDelete("/deleteCalcItem/{name}", async (string name, CalcContext db) =>
 {
     if (await db.CalcItems.FindAsync(name) is CalcItem ci)
@@ -123,6 +127,7 @@ app.MapDelete("/deleteCalcItem/{name}", async (string name, CalcContext db) =>
     return Results.NotFound();
 });
 
+// Data Migration
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CalcContext>();

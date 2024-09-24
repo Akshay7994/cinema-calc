@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import "./Table.css"
-import { BsFillTrashFill, BsFillPencilFill } from "react-icons/bs"
-import { Window } from './Window'
+import { BsFillTrashFill } from "react-icons/bs"
 import axios from 'axios';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import * as XLSX from 'xlsx';
 import { usePDF } from 'react-to-pdf';  
 
@@ -19,13 +16,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export const Table = () => {
-  const [rowToEdit, setRowToEdit] = useState(null);
-  // const [windowOpen, setWindowOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
   const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});  
-
 
   const row = {
     name: "",
@@ -36,7 +30,7 @@ export const Table = () => {
 
   var grossTotal = 0;
 
-  // Function to fetch data using Axios
+  // Get Data on load
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:8080/getCalcData");
@@ -46,22 +40,20 @@ export const Table = () => {
     }
   };
 
-  // Call fetchData on component mount
+  // getData on component mount
   useEffect(() => {
-    // console.log("useEffect")
     fetchData();
   }, []);
 
-
+  // Add Item
   const handleAdd = async () => {
     setRows([...rows, row])
   };
 
+  // Delete Row
   const deleteRow = async (id, name) => {
-    console.log(id, name);
-    
+    // Confirmation 
     if (window.confirm('Are you sure you want to delete this entry!!?')) {
-      // Save it!
       console.log('This was deleted in the database.');
       setRows(rows.filter((_, idx) => idx !== id));
       try {
@@ -73,17 +65,11 @@ export const Table = () => {
         setAlert({ open: true, message: 'Failed to Delete the Row!', severity: 'error' });
       }
     } else {
-      // Do nothing!
       console.log('Thing was not deleted in the database.');
     }
   };
 
-  // const editRow = async (id, name) => {
-  //   console.log(id, name);
-  //   setRowToEdit(id)
-  //   setWindowOpen(true)
-  // };
-
+  // API call to add and update data
   const submitData = async (newRow) => {
     if(newRow.name !== "" && newRow.price !== "" && newRow.percentage !== ""){
       console.log("Sent: ",newRow)
@@ -99,46 +85,7 @@ export const Table = () => {
     }
   }
 
-  // const handleSubmit = async (newRow) => {
-  //   newRow.total = parseInt(newRow.price) + (parseInt(newRow.price) * parseInt(newRow.percentage) / 100);
-  //   console.log("New Row total:", newRow.total)
-  //   if (rowToEdit === null) {
-  //     setRows([...rows, newRow])
-  //     try {
-  //       const response = await axios.post("http://localhost:8080/addCalcItems", newRow);
-  //       console.log("Row created:", response.data);
-  //     } catch (error) {
-  //       console.error("Error creating post:", error);
-  //     }
-  //   } else {
-  //     setRows(
-  //       rows.map((currRow, idx) => {
-  //         if (idx !== rowToEdit) return currRow;
-
-  //         return newRow;
-  //       })
-  //     );
-  //     try {
-  //       const response = await axios.post("http://localhost:8080/updateCalcItem/" + newRow.name, newRow);
-  //       console.log("Row Updated:", response.data);
-  //     } catch (error) {
-  //       console.error("Error creating post:", error);
-  //     }
-
-  //   }
-
-  //   // rowToEdit === null
-  //   //   ? setRows([...rows, newRow])
-  //   //   : setRows(
-  //   //     rows.map((currRow, idx) => {
-  //   //       if (idx !== rowToEdit) return currRow;
-
-  //   //       return newRow;
-  //   //     })
-  //   //   );
-
-  // };
-
+  // Handling Input 
   const onChangeInput = (e, id) => {
     const { name, value } = e.target
     console.log(id, name, value)
@@ -167,6 +114,7 @@ export const Table = () => {
     setDebounceTimeout(timeout);
   }
 
+  // Close Alert
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -174,6 +122,7 @@ export const Table = () => {
     setAlert({ ...alert, open: false });
   };
 
+  // Export Excel
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
@@ -184,8 +133,6 @@ export const Table = () => {
   return (
     <div ref={targetRef}>
       <button className='gradButton' onClick={() => handleAdd()}>Add New Item</button>
-      {/* <Button variant="contained" onClick={() => handleAdd()} disableElevation>
-      Add New Item    </Button> */}
       <Card className='card-rad'>
         <table className='table'>
           <thead>
@@ -264,10 +211,6 @@ export const Table = () => {
                         className="delete-btn"
                         onClick={() => deleteRow(id, row.name)}
                       />
-                      {/* <BsFillPencilFill
-                        className="edit-btn"
-                        onClick={() => editRow(id, row.name)}
-                      /> */}
                     </span>
                   </td>
                 </tr>

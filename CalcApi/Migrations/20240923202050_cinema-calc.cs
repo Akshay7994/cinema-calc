@@ -5,7 +5,7 @@
 namespace CalcApi.Migrations
 {
     /// <inheritdoc />
-    public partial class calcdataMigration : Migration
+    public partial class cinemacalc : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

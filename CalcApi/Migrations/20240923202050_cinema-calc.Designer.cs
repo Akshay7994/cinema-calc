@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CalcApi.Migrations
 {
     [DbContext(typeof(CalcContext))]
-    [Migration("20240919094514_calcdataMigration")]
-    partial class calcdataMigration
+    [Migration("20240923202050_cinema-calc")]
+    partial class cinemacalc
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
