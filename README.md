@@ -1,6 +1,6 @@
 # Cinema Calc Coding Challenge
 
-## Quaetions
+## Questions
 1. How to run the project locally?
 ```
 Create a .env file with *DB_USER* and *DB_PASSWORD*
