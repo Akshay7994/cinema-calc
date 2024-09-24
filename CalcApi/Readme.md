@@ -6,6 +6,3 @@
     - dotnet ef migrations add <nameForYourMigration>
     - dotnet ef database update
 6. Generate a controller and link it with its respective model.
-
-
-Postgresql pass = MPSIGC6JQV5WB79N4032K8XAYETUZ1HD
